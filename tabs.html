@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мои сайты</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --accent: #4f8ef7;
+    --accent2: #7c5cfc;
+    --text: #e8eaf0;
+    --text-dim: #6b7080;
+    --radius: 16px;
+    --gap: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Manrope', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px 16px 60px;
+  }
+
+  .tabs-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 16px;
+    scrollbar-width: none;
+    align-items: center;
+  }
+  .tabs-bar::-webkit-scrollbar { display: none; }
+
+  .tab {
+    flex-shrink: 0;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1.5px solid #2e3248;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Manrope', sans-serif;
+    transition: all 0.15s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-color: transparent;
+    color: #fff;
+  }
+
+  .tab-add-btn {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1.5px dashed #2e3248;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    font-family: 'Manrope', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s, color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tab-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .group-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .group-actions { display: flex; gap: 8px; }
+  .group-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 12px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .group-btn:hover { background: var(--surface2); color: var(--text); }
+  .group-btn.danger:hover { background: #3a1a1a; color: #e05252; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: var(--gap);
+  }
+
+  .tile {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 18px 12px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    position: relative;
+    border: 1.5px solid transparent;
+    transition: border-color 0.18s, background 0.18s, transform 0.15s;
+    text-decoration: none;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tile:active { transform: scale(0.96); }
+  .tile:hover { border-color: var(--surface2); background: #1e2233; }
+
+  .tile .del {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #2a2d3e;
+    border: none;
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background 0.15s, color 0.15s;
+  }
+  .tile:hover .del { display: flex; }
+  .tile .del:hover { background: #e05252; color: #fff; }
+
+  .favicon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    overflow: hidden;
+    flex-shrink: 0;
+    color: var(--text-dim);
+    font-weight: 700;
+  }
+  .favicon img { width: 28px; height: 28px; object-fit: contain; }
+
+  .tile-name {
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text);
+    line-height: 1.3;
+    word-break: break-word;
+    max-width: 100%;
+  }
+
+  .tile-add {
+    background: transparent;
+    border: 1.5px dashed #2e3248;
+    color: var(--text-dim);
+    cursor: pointer;
+    min-height: 90px;
+    justify-content: center;
+    gap: 6px;
+    transition: border-color 0.18s, color 0.18s;
+  }
+  .tile-add:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
+  .tile-add .plus { font-size: 26px; line-height: 1; }
+  .tile-add .add-label { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; }
+
+  .overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 0 24px;
+  }
+  .overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border-radius: 20px 20px 16px 16px;
+    padding: 24px 20px 20px;
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: slideUp 0.22s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal h2 { font-size: 15px; font-weight: 700; color: var(--text); }
+  .modal input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid #2e3248;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .modal input:focus { border-color: var(--accent); }
+  .modal input::placeholder { color: var(--text-dim); }
+  .modal-btns { display: flex; gap: 10px; margin-top: 2px; }
+  .btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .btn:active { opacity: 0.8; }
+  .btn-cancel { background: var(--surface2); color: var(--text-dim); }
+  .btn-save { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="tabs-bar" id="tabs-bar"></div>
+<div class="group-header">
+  <span class="group-title" id="group-title"></span>
+  <div class="group-actions">
+    <button class="group-btn" id="btn-rename-group">✏️ Переим.</button>
+    <button class="group-btn danger" id="btn-delete-group">🗑 Удалить</button>
+  </div>
+</div>
+<div class="grid" id="grid"></div>
+
+<div class="overlay" id="overlay-site">
+  <div class="modal">
+    <h2>Добавить сайт</h2>
+    <input id="inp-url" type="url" placeholder="https://example.com" autocomplete="off" />
+    <input id="inp-name" type="text" placeholder="Название (необязательно)" autocomplete="off" />
+    <div class="modal-btns">
+      <button class="btn btn-cancel" id="btn-site-cancel">Отмена</button>
+      <button class="btn btn-save" id="btn-site-save">Добавить</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-group">
+  <div class="modal">
+    <h2 id="group-modal-title">Новая группа</h2>
+    <input id="inp-group-name" type="text" placeholder="Название группы" autocomplete="off" />
+    <div class="modal-btns">
+      <button class="btn btn-cancel" id="btn-group-cancel">Отмена</button>
+      <button class="btn btn-save" id="btn-group-save">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY = 'speedial_groups_v1';
+
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem(KEY));
+    if (d && d.groups) return d;
+  } catch {}
+  return { activeGroup: 0, groups: [{ name: 'Главная', sites: [] }] };
+}
+
+function save(data) {
+  localStorage.setItem(KEY, JSON.stringify(data));
+}
+
+function domain(url) {
+  try { return new URL(url).hostname; } catch { return ''; }
+}
+
+function faviconUrl(url) {
+  const d = domain(url);
+  return d ? `https://www.google.com/s2/favicons?domain=${d}&sz=64` : '';
+}
+
+function initials(str) {
+  return (str || '?').slice(0, 2).toUpperCase();
+}
+
+let data = load();
+
+function activeIdx() {
+  return Math.min(data.activeGroup, data.groups.length - 1);
+}
+
+function render() {
+  data.activeGroup = activeIdx();
+  const idx = activeIdx();
+  const group = data.groups[idx];
+
+  const bar = document.getElementById('tabs-bar');
+  bar.innerHTML = '';
+  data.groups.forEach((g, i) => {
+    const t = document.createElement('button');
+    t.className = 'tab' + (i === idx ? ' active' : '');
+    t.textContent = g.name;
+    t.addEventListener('click', () => { data.activeGroup = i; save(data); render(); });
+    bar.appendChild(t);
+  });
+  const addTab = document.createElement('button');
+  addTab.className = 'tab-add-btn';
+  addTab.title = 'Новая группа';
+  addTab.textContent = '+';
+  addTab.addEventListener('click', openGroupModal);
+  bar.appendChild(addTab);
+
+  document.getElementById('group-title').textContent = group.name;
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  group.sites.forEach((site, i) => {
+    const a = document.createElement('a');
+    a.className = 'tile';
+    a.href = site.url;
+
+    const fav = document.createElement('div');
+    fav.className = 'favicon';
+    const fu = faviconUrl(site.url);
+    if (fu) {
+      const img = document.createElement('img');
+      img.src = fu;
+      img.onerror = () => { fav.innerHTML = ''; fav.textContent = initials(site.name || domain(site.url)); };
+      fav.appendChild(img);
+    } else {
+      fav.textContent = initials(site.name || site.url);
+    }
+
+    const name = document.createElement('div');
+    name.className = 'tile-name';
+    name.textContent = site.name || domain(site.url);
+
+    const del = document.createElement('button');
+    del.className = 'del';
+    del.textContent = '×';
+    del.addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      data.groups[activeIdx()].sites.splice(i, 1);
+      save(data); render();
+    });
+
+    a.appendChild(del); a.appendChild(fav); a.appendChild(name);
+    grid.appendChild(a);
+  });
+
+  const addTile = document.createElement('div');
+  addTile.className = 'tile tile-add';
+  addTile.innerHTML = '<span class="plus">+</span><span class="add-label">Добавить</span>';
+  addTile.addEventListener('click', openSiteModal);
+  grid.appendChild(addTile);
+}
+
+// Site modal
+function openSiteModal() {
+  document.getElementById('inp-url').value = '';
+  document.getElementById('inp-name').value = '';
+  document.getElementById('overlay-site').classList.add('open');
+  setTimeout(() => document.getElementById('inp-url').focus(), 100);
+}
+function closeSiteModal() {
+  document.getElementById('overlay-site').classList.remove('open');
+}
+document.getElementById('btn-site-cancel').addEventListener('click', closeSiteModal);
+document.getElementById('overlay-site').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('overlay-site')) closeSiteModal();
+});
+document.getElementById('btn-site-save').addEventListener('click', () => {
+  let url = document.getElementById('inp-url').value.trim();
+  if (!url) return;
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  const name = document.getElementById('inp-name').value.trim() || domain(url);
+  data.groups[activeIdx()].sites.push({ url, name });
+  save(data); closeSiteModal(); render();
+});
+document.getElementById('inp-url').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('btn-site-save').click();
+});
+
+// Group modal
+let groupModalMode = 'add';
+function openGroupModal() {
+  groupModalMode = 'add';
+  document.getElementById('group-modal-title').textContent = 'Новая группа';
+  document.getElementById('inp-group-name').value = '';
+  document.getElementById('overlay-group').classList.add('open');
+  setTimeout(() => document.getElementById('inp-group-name').focus(), 100);
+}
+function openRenameModal() {
+  groupModalMode = 'rename';
+  document.getElementById('group-modal-title').textContent = 'Переименовать группу';
+  document.getElementById('inp-group-name').value = data.groups[activeIdx()].name;
+  document.getElementById('overlay-group').classList.add('open');
+  setTimeout(() => document.getElementById('inp-group-name').focus(), 100);
+}
+function closeGroupModal() {
+  document.getElementById('overlay-group').classList.remove('open');
+}
+document.getElementById('btn-group-cancel').addEventListener('click', closeGroupModal);
+document.getElementById('overlay-group').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('overlay-group')) closeGroupModal();
+});
+document.getElementById('btn-group-save').addEventListener('click', () => {
+  const name = document.getElementById('inp-group-name').value.trim();
+  if (!name) return;
+  if (groupModalMode === 'add') {
+    data.groups.push({ name, sites: [] });
+    data.activeGroup = data.groups.length - 1;
+  } else {
+    data.groups[activeIdx()].name = name;
+  }
+  save(data); closeGroupModal(); render();
+});
+document.getElementById('inp-group-name').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('btn-group-save').click();
+});
+
+document.getElementById('btn-rename-group').addEventListener('click', openRenameModal);
+document.getElementById('btn-delete-group').addEventListener('click', () => {
+  if (data.groups.length === 1) { alert('Нельзя удалить последнюю группу'); return; }
+  if (!confirm('Удалить группу «' + data.groups[activeIdx()].name + '»?')) return;
+  data.groups.splice(activeIdx(), 1);
+  data.activeGroup = Math.max(0, activeIdx() - 1);
+  save(data); render();
+});
+
+render();
+</script>
+</body>
+</html>
