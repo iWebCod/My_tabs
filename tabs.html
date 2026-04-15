@@ -113,6 +113,17 @@
   .group-btn:hover { background: var(--surface2); color: var(--text); }
   .group-btn.danger:hover { background: #3a1a1a; color: var(--danger); }
 
+  .backup-status {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    white-space: nowrap;
+    padding: 2px 0;
+  }
+  .backup-status.fresh  { color: #4caf7d; }
+  .backup-status.warn   { color: #e0a852; }
+  .backup-status.danger { color: var(--danger); }
+
   /* ── Grid ────────────────────────────────────────────────── */
   .grid {
     display: grid;
@@ -308,6 +319,7 @@
     <button class="group-btn" id="btn-rename-group">✏ Переим.</button>
     <button class="group-btn danger" id="btn-delete-group">🗑 Удалить</button>
     <button class="group-btn" id="btn-backup">↓ Бэкап</button>
+    <span class="backup-status" id="backup-status"></span>
     <button class="group-btn" id="btn-import-trigger">↑ Импорт</button>
     <input type="file" id="inp-import" accept=".json,application/json">
   </div>
@@ -347,7 +359,8 @@
 'use strict';
 
 /* ── Storage ───────────────────────────────────────────────── */
-const KEY = 'speedial_groups_v1';
+const KEY        = 'speedial_groups_v1';
+const BACKUP_KEY = 'speedial_last_backup';
 
 function load() {
   try {
@@ -714,6 +727,8 @@ document.getElementById('btn-backup').addEventListener('click', () => {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+  localStorage.setItem(BACKUP_KEY, Date.now());
+  renderBackupStatus();
 });
 
 /* ── Import ────────────────────────────────────────────────── */
@@ -743,8 +758,52 @@ document.getElementById('inp-import').addEventListener('change', (e) => {
   reader.readAsText(file);
 });
 
+/* ── Backup status ─────────────────────────────────────────── */
+function formatBackupTime(ts) {
+  const now  = Date.now();
+  const diff = now - ts;
+  const days = diff / 86400000;
+  const d    = new Date(ts);
+
+  const hhmm = d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+
+  let dateStr;
+  const today     = new Date(); today.setHours(0,0,0,0);
+  const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+  const thatDay   = new Date(d); thatDay.setHours(0,0,0,0);
+
+  if (thatDay.getTime() === today.getTime()) {
+    dateStr = 'Сегодня';
+  } else if (thatDay.getTime() === yesterday.getTime()) {
+    dateStr = 'Вчера';
+  } else {
+    dateStr = d.toLocaleDateString('ru', { day: 'numeric', month: 'short' });
+    if (d.getFullYear() !== today.getFullYear()) {
+      dateStr += ' ' + d.getFullYear();
+    }
+  }
+
+  return { text: `${dateStr}, ${hhmm}`, days };
+}
+
+function renderBackupStatus() {
+  const el = document.getElementById('backup-status');
+  const ts = parseInt(localStorage.getItem(BACKUP_KEY), 10);
+
+  if (!ts || isNaN(ts)) {
+    el.textContent = 'бэкап не делался';
+    el.className   = 'backup-status danger';
+    return;
+  }
+
+  const { text, days } = formatBackupTime(ts);
+  el.textContent = text;
+  el.className   = 'backup-status ' + (days < 7 ? 'fresh' : days < 30 ? 'warn' : 'danger');
+}
+
 /* ── Boot ──────────────────────────────────────────────────── */
 render();
+renderBackupStatus();
 </script>
 </body>
 </html>
